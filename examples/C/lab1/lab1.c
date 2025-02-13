@@ -22,24 +22,24 @@ int mul_q31(int a, int b) {
 // y[i] = c[0]*x[i] + c[1]*x[i+1] + ... + c[m-1]*x[i+m-1]
 // inputs in Q1.31 format
 void fir(int x[], int c[], int y[], int n, int m) {
-	// TODO: your code here, use add_q31 and mul_q31
-    for (int j = 0; j < n; ++j) {
-        int sum = 0;
-        for (int i = 0; i < m; ++i) {
-            int part1 = c[i];
-            // int negi = ~i + 1; // negative i
-            // int ads = add_q31(j, negi);
-            // int mred = add_q31(m, 0x11111111); // m - 1
-            // int part2in = add_q31(ads, mred);
-            // int part2out = x[part2in];
-            int part2in = (j - i + (m - 1));
-            int part2out = x[part2in];
 
-            int res = mul_q31(part1, part2out);
-            sum = add_q31(sum, res);
-        }
-        y[j] = sum;
-    }
+    // for (int j = 0; j < n; ++j) {
+    //     int sum = 0;
+    //     for (int i = 0; i < m; ++i) {
+    //         int part1 = c[i];
+    //         // int negi = ~i + 1; // negative i
+    //         // int ads = add_q31(j, negi);
+    //         // int mred = add_q31(m, 0x11111111); // m - 1
+    //         // int part2in = add_q31(ads, mred);
+    //         // int part2out = x[part2in];
+    //         int part2in = (j - i + (m - 1));
+    //         int part2out = x[part2in];
+
+    //         int res = mul_q31(part1, part2out);
+    //         sum = add_q31(sum, res);
+    //     }
+    //     y[j] = sum;
+    // }
 }
 
 int main(void) {
