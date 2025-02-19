@@ -1,46 +1,47 @@
 #include <stdio.h>  // supports printf
 #include "util.h"   // supports verify
 //#include <stdint.h> // for longer ints
+extern void fir(int[], int[], int[], int, int);
 
-// Add two Q1.31 fixed point numbers
-int add_q31(int a, int b) {
-    int result = a + b;
-    return result;
-}
+// // Add two Q1.31 fixed point numbers
+// int add_q31(int a, int b) {
+//     int result = a + b;
+//     return result;
+// }
 
-// Multiply two Q1.31 fixed point numbers
-int mul_q31(int a, int b) {
-    long value = (long)a*(long)b;
-    int shift = (value << 1) >> 32;
-    return shift;
-    printf("mul_q31: a = %x, b = %x, res = %lx, result = %x\n", a, b, value, shift);
+// // Multiply two Q1.31 fixed point numbers
+// int mul_q31(int a, int b) {
+//     long value = (long)a*(long)b;
+//     int shift = (value << 1) >> 32;
+//     return shift;
+//     printf("mul_q31: a = %x, b = %x, res = %lx, result = %x\n", a, b, value, shift);
 
-}
+// }
 
-// low pass filter x with coefficients c, result in y
-// n is the length of x, m is the length of c
-// y[i] = c[0]*x[i] + c[1]*x[i+1] + ... + c[m-1]*x[i+m-1]
-// inputs in Q1.31 format
-void fir(int x[], int c[], int y[], int n, int m) {
+// // low pass filter x with coefficients c, result in y
+// // n is the length of x, m is the length of c
+// // y[i] = c[0]*x[i] + c[1]*x[i+1] + ... + c[m-1]*x[i+m-1]
+// // inputs in Q1.31 format
+// void fir(int x[], int c[], int y[], int n, int m) {
 
-    // for (int j = 0; j < n; ++j) {
-    //     int sum = 0;
-    //     for (int i = 0; i < m; ++i) {
-    //         int part1 = c[i];
-    //         // int negi = ~i + 1; // negative i
-    //         // int ads = add_q31(j, negi);
-    //         // int mred = add_q31(m, 0x11111111); // m - 1
-    //         // int part2in = add_q31(ads, mred);
-    //         // int part2out = x[part2in];
-    //         int part2in = (j - i + (m - 1));
-    //         int part2out = x[part2in];
+//     for (int j = 0; j < n; ++j) {
+//         int sum = 0;
+//         for (int i = 0; i < m; ++i) {
+//             int part1 = c[i];
+//             // int negi = ~i + 1; // negative i
+//             // int ads = add_q31(j, negi);
+//             // int mred = add_q31(m, 0x11111111); // m - 1
+//             // int part2in = add_q31(ads, mred);
+//             // int part2out = x[part2in];
+//             int part2in = (j - i + (m - 1));
+//             int part2out = x[part2in];
 
-    //         int res = mul_q31(part1, part2out);
-    //         sum = add_q31(sum, res);
-    //     }
-    //     y[j] = sum;
-    // }
-}
+//             int res = mul_q31(part1, part2out);
+//             sum = add_q31(sum, res);
+//         }
+//         y[j] = sum;
+//     }
+// }
 
 int main(void) {
     int32_t sin_table[20] = { // in Q1.31 format

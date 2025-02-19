@@ -4,14 +4,15 @@
 
 # designed echoing the approach to 2.14 in the textbook question sets
 # a0 = x[], a1 = c[], a2 = y[], a3 = n, a4 = m
-
+.global fir
 fir: 
+
     li t6, 0        # j = 0
     lw t3, 0(a3)      # n
     lw t4, 0(a4)      # m
 
 L1:
-    beq t6, t3, exit    # termination check j = n
+    beq t6, t3, done    # termination check j = n
     li t0, 0		# sum = 0
     li t5, 0       # initialize i = 0
     j L2
@@ -45,5 +46,5 @@ L1ret:
     addi a2, a2, 4      # increment y[j]
     j L1
 
-exit:
+done:
     ret
