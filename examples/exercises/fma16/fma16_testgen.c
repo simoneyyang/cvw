@@ -18,6 +18,14 @@ typedef union sp {
 uint16_t easyExponents[] = {15, 0x8000};
 uint16_t easyFracts[] = {0, 0x200, 0x8000}; // 1.0 and 1.1
 
+// medium difficulty tests
+uint16_t medExponents[] = {9, 12, 15, 18, 21, 0x8000}; 
+// ^^ biased exponents make -6, -3, 0, 3, 6 and terminate 
+// +/- 6 was the best one I could think of to test exponent handling without overflow/underflow
+uint16_t medFracts[] = {0, 0x200,  0x001, 0x3FF,0x8000}; 
+// ^^ 1.0, 1.5, 1.0009765625 (smallest nonzero), 1.9990234375 (largest) and terminate
+// aka bimary significands of 1.0, 1.1, 1.0000000001, 1.1111111111
+
 void softfloatInit(void) {
     softfloat_roundingMode = softfloat_round_minMag; 
     softfloat_exceptionFlags = 0;
@@ -129,6 +137,62 @@ void genMulTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, 
     fclose(fptr);
 }
 
+void genAddTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, int roundingMode, int zeroAllowed, int infAllowed, int nanAllowed) {
+    int i, j, k, numCases;
+    float16_t x, y, z;
+    float16_t cases[100000];
+    FILE *fptr;
+    char fn[80];
+ 
+    sprintf(fn, "work/%s.tv", testName);
+    if ((fptr = fopen(fn, "w")) == 0) {
+        printf("Error opening to write file %s.  Does directory exist?\n", fn);
+        exit(1);
+    }
+    prepTests(e, f, testName, desc, cases, fptr, &numCases);
+    y.v = 0x0000;
+    for (i=0; i < numCases; i++) { 
+        x.v = cases[i].v;
+        for (j=0; j<numCases; j++) {
+            z.v = cases[j].v;
+            for (k=0; k<=sgn; k++) {
+                z.v ^= (k<<15);
+                genCase(fptr, x, y, z, 0, 1, 0, 0, roundingMode, zeroAllowed, infAllowed, nanAllowed);
+            }
+        }
+    }
+    fclose(fptr);
+}
+
+void genFmaTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, int roundingMode, int zeroAllowed, int infAllowed, int nanAllowed) {
+    int i, j, k, numCases;
+    float16_t x, y, z;
+    float16_t cases[100000];
+    FILE *fptr;
+    char fn[80];
+ 
+    sprintf(fn, "work/%s.tv", testName);
+    if ((fptr = fopen(fn, "w")) == 0) {
+        printf("Error opening to write file %s.  Does directory exist?\n", fn);
+        exit(1);
+    }
+    prepTests(e, f, testName, desc, cases, fptr, &numCases);
+    for (i=0; i < numCases; i++) { 
+        x.v = cases[i].v;
+        for (j=0; j<numCases; j++) {
+            y.v = cases[j].v;
+            for (k=0; k<numCases; k++) {
+                z.v = cases[k].v;
+                for (l=0; l<=sgn; l++) {
+                    y.v ^= (l<<15);
+                    genCase(fptr, x, y, z, 1, 1, 0, 0, roundingMode, zeroAllowed, infAllowed, nanAllowed);
+                }
+            }
+        }
+    }
+    fclose(fptr);
+}
+
 int main()
 {
     if (system("mkdir -p work") != 0) exit(1); // create work directory if it doesn't exist
@@ -137,11 +201,23 @@ int main()
     // Test cases: multiplication
     genMulTests(easyExponents, easyFracts, 0, "fmul_0", "// Multiply with exponent of 0, significand of 1.0 and 1.1, RZ", 0, 0, 0, 0);
 
-/*  // example of how to generate tests with a different rounding mode
+    /*  // example of how to generate tests with a different rounding mode
     softfloat_roundingMode = softfloat_round_near_even; 
     genMulTests(easyExponents, easyFracts, 0, "fmul_0_rne", "// Multiply with exponent of 0, significand of 1.0 and 1.1, RNE", 1, 0, 0, 0); */
 
     // Add your cases here
   
+    genMulTests(medExponents, medFracts, 0, "fmul_1", "// Multiply with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+    genMulTests(medExponents, medFracts, 1, "fmul_2", "// Multiply with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+
+    genAddTests(easyExponents, easyFracts, 0, "fadd_0", "// Add with exponent of 0, significand of 1.0 and 1.1, RZ", 0, 0, 0, 0);
+    genAddTests(medExponents, medFracts, 0, "fadd_1", "// Add with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+    genAddTests(medExponents, medFracts, 1, "fadd_2", "// Add with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+
+    genFmaTests(easyExponents, easyFracts, 0, "fma_0", "// FMA with exponent of 0, significand of 1.0 and 1.1, RZ", 0, 0, 0, 0);
+    genFmaTests(medExponents, medFracts, 0, "fma_1", "// FMA with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+    genFmaTests(medExponents, medFracts, 1, "fma_2", "// FMA with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
+
+
     return 0;
 }
