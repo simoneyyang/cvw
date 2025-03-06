@@ -32,11 +32,11 @@ uint16_t specExponents[] = {0, 1, 15, 30, 31, 0x8000};
 uint16_t specFracts[] = {0, 0x001, 0x200, 0x3FE, 0x3FF,0x8000}; 
 // ^^ 1.0, 1.0009765625 (smallest nonzero), 1.5, 1.998046875, 1.9990234375 (largest) and terminate
 
-// mean to rounding tests
-uint16_t roundExponents[] = {1, 2, 3, 28, 29, 30, 0x8000}; 
-// ^^ biased exponents make -14, -13, -12, 12, 13, 14, and terminate 
-uint16_t roundFracts[] = {0, 0x001, 0x200, 0x300, 0x3FF,0x8000}; 
-// ^^ 1.0, 1.0009765625 (smallest nonzero), 1.5, 1.998046875, 1.9990234375 (largest) and terminate
+// my attempt at evilish tests
+uint16_t simoneExponents[] = {3, 14, 15, 16, 28, 0x8000}; 
+// ^^ biased exponents make -12, -1, 0, 1, 12, and terminate 
+uint16_t simoneFracts[] = {0x333, 0x081, 0x181, 0x2AA, 0x300, 0x3FF,0x8000}; 
+// ^^ 1.7998046875, 1.1259765625, 1.3759765625, 1.666015625, 1.75, 1.9990234375 (largest) and terminate
 
 void softfloatInit(void) {
     softfloat_roundingMode = softfloat_round_minMag; 
@@ -219,18 +219,31 @@ int main()
 
     // Add your cases here
   
+    // MUL
     genMulTests(medExponents, medFracts, 0, "fmul_1", "// Multiply with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
     genMulTests(medExponents, medFracts, 1, "fmul_2", "// Multiply with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
 
+    // ADD
     genAddTests(easyExponents, easyFracts, 0, "fadd_0", "// Add with exponent of 0, significand of 1.0 and 1.1, RZ", 0, 0, 0, 0);
     genAddTests(medExponents, medFracts, 0, "fadd_1", "// Add with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
     genAddTests(medExponents, medFracts, 1, "fadd_2", "// Add with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
 
+    // FMA
     genFmaTests(easyExponents, easyFracts, 0, "fma_0", "// FMA with exponent of 0, significand of 1.0 and 1.1, RZ", 0, 0, 0, 0);
     genFmaTests(medExponents, medFracts, 0, "fma_1", "// FMA with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
     genFmaTests(medExponents, medFracts, 1, "fma_2", "// FMA with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
 
+    // Mine
+    genFmaTests(simoneExponents, simoneFracts, 1, "fma_simone", "// FMA with far too many options, RZ", 0, 1, 1, 1);
+
+    // rounding modes
     genFmaTests(specExponents, specFracts, 1, "fma_special_rz", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 1, 1, 1);
+    softfloat_roundingMode = softfloat_round_near_even;
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rne", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RNE", 1, 1, 1, 1);
+    softfloat_roundingMode = softfloat_round_max;
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rp", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RP", 1, 1, 1, 1);
+    softfloat_roundingMode = softfloat_round_min;
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rn", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RN", 1, 1, 1, 1);
 
     return 0;
 }
