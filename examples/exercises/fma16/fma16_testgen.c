@@ -3,6 +3,8 @@
 // Generate tests for 16-bit FMA
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
+// Modified by Simone Yang for coursework
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
