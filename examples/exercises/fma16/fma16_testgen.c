@@ -21,10 +21,22 @@ uint16_t easyFracts[] = {0, 0x200, 0x8000}; // 1.0 and 1.1
 // medium difficulty tests
 uint16_t medExponents[] = {9, 12, 15, 18, 21, 0x8000}; 
 // ^^ biased exponents make -6, -3, 0, 3, 6 and terminate 
-// +/- 6 was the best one I could think of to test exponent handling without overflow/underflow
+// +/- 6 was the best one I could think of to test exponent handling without many overflow/underflow cases
 uint16_t medFracts[] = {0, 0x200,  0x001, 0x3FF,0x8000}; 
 // ^^ 1.0, 1.5, 1.0009765625 (smallest nonzero), 1.9990234375 (largest) and terminate
-// aka bimary significands of 1.0, 1.1, 1.0000000001, 1.1111111111
+// aka binary significands of 1.0, 1.1, 1.0000000001, 1.1111111111
+
+// special tests
+uint16_t specExponents[] = {0, 1, 15, 30, 31, 0x8000}; 
+// ^^ biased exponents make 0x00000, -14, 0, 14, 0x11111 and terminate 
+uint16_t specFracts[] = {0, 0x001, 0x200, 0x3FE, 0x3FF,0x8000}; 
+// ^^ 1.0, 1.0009765625 (smallest nonzero), 1.5, 1.998046875, 1.9990234375 (largest) and terminate
+
+// mean to rounding tests
+uint16_t roundExponents[] = {1, 2, 3, 28, 29, 30, 0x8000}; 
+// ^^ biased exponents make -14, -13, -12, 12, 13, 14, and terminate 
+uint16_t roundFracts[] = {0, 0x001, 0x200, 0x300, 0x3FF,0x8000}; 
+// ^^ 1.0, 1.0009765625 (smallest nonzero), 1.5, 1.998046875, 1.9990234375 (largest) and terminate
 
 void softfloatInit(void) {
     softfloat_roundingMode = softfloat_round_minMag; 
@@ -165,7 +177,7 @@ void genAddTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, 
 }
 
 void genFmaTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, int roundingMode, int zeroAllowed, int infAllowed, int nanAllowed) {
-    int i, j, k, numCases;
+    int i, j, k, l, numCases;
     float16_t x, y, z;
     float16_t cases[100000];
     FILE *fptr;
@@ -218,6 +230,7 @@ int main()
     genFmaTests(medExponents, medFracts, 0, "fma_1", "// FMA with exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
     genFmaTests(medExponents, medFracts, 1, "fma_2", "// FMA with signed, exponent of 0, -3, 3, -7, or 7, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 0, 0, 0);
 
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rz", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RZ", 0, 1, 1, 1);
 
     return 0;
 }
