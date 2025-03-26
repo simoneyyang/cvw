@@ -3,6 +3,7 @@
 //
 // Written: David_Harris@hmc.edu 16 February 2021
 // Modified: simyang@hmc.edu 18 March 2025
+//                           22 March 2025
 //
 // Purpose: Integer multiplication
 // 
@@ -54,31 +55,22 @@ module mul #(parameter XLEN) (
   assign PP1E = AP*BP;
   assign PM = (ForwardedSrcAE[XLEN-1] & ForwardedSrcBE[XLEN-1]);
 
-  logic [XLEN-2:0] z;
-  assign z = {(XLEN-1){1'b0}};
-  logic [1:0] a;
-  assign a = 2'b00;
+  assign PA = ({(XLEN-1){ForwardedSrcBE[XLEN-1]}} & ForwardedSrcAE[XLEN-2:0]);
+  assign PB = ({(XLEN-1){ForwardedSrcAE[XLEN-1]}} & ForwardedSrcBE[XLEN-2:0]);
 
-  assign PA = (ForwardedSrcBE[XLEN-1]) ? ForwardedSrcAE[XLEN-2:0] : {(XLEN-1){1'b0}};
-  assign PB = (ForwardedSrcAE[XLEN-1]) ? ForwardedSrcBE[XLEN-2:0] : {(XLEN-1){1'b0}};
-
+  assign PP2E = {2'b00, ((Funct3E == 3'b001) ? ~PA : PA), {(XLEN-1){1'b0}}};
+  assign PP3E = {2'b00, ((Funct3E[0] ^ Funct3E[1]) ? ~PB : PB), {(XLEN-1){1'b0}}};
+  
   always_comb begin
-    if(Funct3E == 3'b000 | Funct3E == 3'b011) begin // mul or mulhu
-       PP2E = {a, PA, z};
-       PP3E = {a, PB, z};
-       PP4E = {1'b0,PM,{(XLEN*2-2){1'b0}}};
-    end
-    else if (Funct3E == 3'b001) begin // mulh
-       PP2E = {a, ~PA, z};
-       PP3E = {a, ~PB, z};
-       PP4E = {1'b1, PM, {(XLEN-3){1'b0}}, 1'b1, {(XLEN){1'b0}}};
-    end
-    else begin // mulhsu
-       PP2E = {a, PA, z};
-       PP3E = {a, ~PB, z};
+    if(Funct3E == 3'b010) //begin // mulhsu
        PP4E = {1'b1, ~PM, {(XLEN-2){1'b0}}, 1'b1, {(XLEN-1){1'b0}}};
-    end
+    else if (Funct3E == 3'b001) // begin // mulh
+       PP4E = {1'b1, PM, {(XLEN-3){1'b0}}, 1'b1, {(XLEN){1'b0}}};
+    else //begin // mul or mulhu // 3'b000 or 3'b011
+       PP4E = {1'b0,PM,{(XLEN*2-2){1'b0}}};
   end
+  
+  //////////////////////////////
   // Memory Stage: Sum partial proudcts
   //////////////////////////////
 
