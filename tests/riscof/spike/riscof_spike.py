@@ -38,7 +38,7 @@ class spike(pluginTemplate):
         # Path to the directory where this python file is located. Collect it from the config.ini
         self.pluginpath=os.path.abspath(config['pluginpath'])
 
-        # Collect the paths to the  riscv-config absed ISA and platform yaml files. One can choose
+        # Collect the paths to the  riscv-config based ISA and platform yaml files. One can choose
         # to hardcode these here itself instead of picking it from the config.ini file.
         self.isa_spec = os.path.abspath(config['ispec'])
         self.platform_spec = os.path.abspath(config['pspec'])
@@ -103,6 +103,8 @@ class spike(pluginTemplate):
           self.isa += 'q'
       if "C" in ispec["ISA"]:
           self.isa += 'c'
+      if "V" in ispec["ISA"]:
+          self.isa += 'v'
       if "Zicsr" in ispec["ISA"]:
           self.isa += '_Zicsr'
       if "Zicond" in ispec["ISA"]:
@@ -141,6 +143,12 @@ class spike(pluginTemplate):
       #TODO: The following assumes you are using the riscv-gcc toolchain. If
       #      not please change appropriately
       self.compile_cmd = self.compile_cmd+' -mabi='+('lp64 ' if 64 in ispec['supported_xlen'] else ('ilp32e ' if "E" in ispec["ISA"] else 'ilp32 '))
+      if 'pmp-grain' in ispec['PMP']:
+          # if the PMP granularity is specified in the isa yaml, then we use that value
+          # convert from G to bytes: g = 2^(G+2) bytes
+          self.granularity = pow(2, ispec['PMP']['pmp-grain']+2)
+      else:
+        self.granularity = 4  # default granularity is 4 bytes 
 
     def runTests(self, testList):
 
@@ -154,7 +162,7 @@ class spike(pluginTemplate):
       # function earlier
       make.makeCommand = 'make -j' + self.num_jobs
 
-      # we will iterate over each entry in the testList. Each entry node will be refered to by the
+      # we will iterate over each entry in the testList. Each entry node will be referred to by the
       # variable testname.
       for testname in testList:
 
@@ -196,7 +204,7 @@ class spike(pluginTemplate):
                 reference_output = re.sub("/src/","/references/", re.sub(".S",".reference_output", test))
                 simcmd = f'cut -c-{8:g} {reference_output} > {sig_file}' #use cut to remove comments when copying
             else:
-                simcmd = self.dut_exe + f' --isa={self.isa} +signature={sig_file} +signature-granularity=4 {elf}'
+                simcmd = self.dut_exe + f' {"--misaligned" if self.xlen == "64" else ""} --isa={self.isa} --pmpgranularity={self.granularity} +signature={sig_file} +signature-granularity=4 {elf}'
           else:
             simcmd = 'echo "NO RUN"'
 

@@ -16,7 +16,7 @@ buildsize: build_speedopt_size build_sizeopt_size
 
 # uses the build_all.py python file to build the tests in addins/embench-iot/bd_speed/ optimized for speed and size
 build_speedopt_speed:
-	$(embench_dir)/build_all.py --builddir=bd_speedopt_speed --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/crt0.S -march=$(ARCH)" --cflags="-O2 -nostartfiles -march=$(ARCH)" 
+	$(embench_dir)/build_all.py --builddir=bd_speedopt_speed --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/crt0.S -march=$(ARCH)" --cflags="-O2 -nostartfiles -march=$(ARCH) -std=gnu17" 
 	# remove files not used in embench1.0  When changing to 2.0, restore these files		
 	#rm -rf $(embench_dir)/bd_speedopt_speed/src/md5sum
 	#rm -rf $(embench_dir)/bd_speedopt_speed/src/tarfind
@@ -24,7 +24,7 @@ build_speedopt_speed:
 	find $(embench_dir)/bd_speedopt_speed/ -type f ! -name "*.*" | while read f; do cp "$$f" "$$f.elf"; done
 
 build_sizeopt_speed:
-	$(embench_dir)/build_all.py --builddir=bd_sizeopt_speed --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/crt0.S -march=$(ARCH)" --cflags="-Os -nostartfiles -march=$(ARCH)" 
+	$(embench_dir)/build_all.py --builddir=bd_sizeopt_speed --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/crt0.S -march=$(ARCH)" --cflags="-Os -nostartfiles -march=$(ARCH) -std=gnu17" 
 	# remove files not used in embench1.0  When changing to 2.0, restore these files		
 	#rm -rf $(embench_dir)/bd_sizeopt_speed/src/md5sum
 	#rm -rf $(embench_dir)/bd_sizeopt_speed/src/tarfind
@@ -33,20 +33,17 @@ build_sizeopt_speed:
 
 # uses the build_all.py python file to build the tests in addins/embench-iot/bd_speed/ optimized for speed and size
 build_speedopt_size:
-	$(embench_dir)/build_all.py --builddir=bd_speedopt_size --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostdlib -nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/dummy.S -march=$(ARCH)" --cflags="-O2 -msave-restore -march=$(ARCH)" --dummy-libs="libgcc libm libc crt0"
+	$(embench_dir)/build_all.py --builddir=bd_speedopt_size --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostdlib -nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/dummy.S -march=$(ARCH)" --cflags="-O2 -msave-restore -march=$(ARCH) -std=gnu17" --dummy-libs="libgcc libm libc crt0"
 
 build_sizeopt_size:
-	$(embench_dir)/build_all.py --builddir=bd_sizeopt_size --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostdlib -nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/dummy.S -march=$(ARCH)" --cflags="-Os -msave-restore -march=$(ARCH)" --dummy-libs="libgcc libm libc crt0"
+	$(embench_dir)/build_all.py --builddir=bd_sizeopt_size --arch riscv32 --chip generic --board rv32wallyverilog --ldflags="-nostdlib -nostartfiles ../../../config/riscv32/boards/rv32wallyverilog/startup/dummy.S -march=$(ARCH)" --cflags="-Os -msave-restore -march=$(ARCH) -std=gnu17" --dummy-libs="libgcc libm libc crt0"
 
 # builds dependencies, then launches sim and finally runs python wrapper script to present results
 sim: sim_build_memfile sim_run speed
 
 # launches sim to simulate tests on wally
 sim_run:
-	wsim rv32gc embench
-	#mkdir -p ../../sim/wkdir
-	#(cd ../../sim/ && wsim rv32gc embench)
-	#cd ../../benchmarks/embench/
+	wsim --sim verilator rv32gc embench --params "BPRED_LOGGER=1\'b1" 
 
 # builds the objdump based on the compiled c elf files
 objdump:
@@ -63,18 +60,22 @@ sim_build_memfile: objdump
 spike: buildspeed spike_run speed
 
 # command to run spike on all of the benchmarks
-spike_run:
+spike_run: 
 	find $(embench_dir)/bd_*opt_speed/ -type f -name "*.elf" | while read f; do spike --isa=rv32imac +signature=$$f.spike.output +signature-granularity=4 $$f; done
 
+# creates the directory to store the results of the embench tests
+actual_embench_results:
+	mkdir -p actual_embench_results
+
 # python wrapper to present results of embench size benchmark
-size: buildsize
-	$(embench_dir)/benchmark_size.py --builddir=bd_speedopt_size --json-output > wallySpeedOpt_size.json 
-	$(embench_dir)/benchmark_size.py --builddir=bd_sizeopt_size --json-output > wallySizeOpt_size.json 
+size: actual_embench_results buildsize
+	$(embench_dir)/benchmark_size.py --builddir=bd_speedopt_size --json-output > actual_embench_results/wallySpeedOpt_size.json 
+	$(embench_dir)/benchmark_size.py --builddir=bd_sizeopt_size --json-output > actual_embench_results/wallySizeOpt_size.json 
 
 # python wrapper to present results of embench speed benchmark
-speed:
-	$(embench_dir)/benchmark_speed.py --builddir=bd_sizeopt_speed --target-module run_wally --cpu-mhz=1 --json-output > wallySizeOpt_speed.json 
-	$(embench_dir)/benchmark_speed.py --builddir=bd_speedopt_speed --target-module run_wally --cpu-mhz=1 --json-output > wallySpeedOpt_speed.json 
+speed: actual_embench_results
+	$(embench_dir)/benchmark_speed.py --builddir=bd_sizeopt_speed --target-module run_wally --cpu-mhz=1 --json-output > actual_embench_results/wallySizeOpt_speed.json 
+	$(embench_dir)/benchmark_speed.py --builddir=bd_speedopt_speed --target-module run_wally --cpu-mhz=1 --json-output > actual_embench_results/wallySpeedOpt_speed.json 
 
 # deletes all files
 clean: 

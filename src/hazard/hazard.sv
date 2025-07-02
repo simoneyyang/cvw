@@ -67,7 +67,7 @@ module hazard (
   // Trap returns (RetM) also flush the entire pipeline after the RetM (all stages except W) because all the subsequent instructions must be discarded.
   // Similarly, CSR writes and fences flush all subsequent instructions and refetch them in light of the new operating modes and cache/TLB contents
   // Branch misprediction is found in the Execute stage and must flush the next two instructions.
-  //   However, an active division operation resides in the Execute stage, and when the BP incorrectly mispredicts the divide as a taken branch, the divde must still complete
+  //   However, an active division operation resides in the Execute stage, and when the BP incorrectly mispredicts the divide as a taken branch, the divide must still complete
   // When a WFI is interrupted and causes a trap, it flushes the rest of the pipeline but not the W stage, because the WFI needs to commit
   assign FlushDCause = TrapM | RetM | CSRWriteFenceM | BPWrongE;
   assign FlushECause = TrapM | RetM | CSRWriteFenceM |(BPWrongE & ~(DivBusyE | FDivBusyE));
@@ -75,7 +75,7 @@ module hazard (
   assign FlushWCause = TrapM & ~WFIInterruptedM;
 
   // Stall causes
-  //  Most data depenency stalls are identified in the decode stage
+  //  Most data dependency stalls are identified in the decode stage
   //  Division stalls in the execute stage
   //  Flushing any stage has priority over the corresponding stage stall.  
   //    Even if the register gave clear priority over enable, various FSMs still need to disable the stall, so it's best to gate the stall here with flush
@@ -101,13 +101,14 @@ module hazard (
   assign StallW = StallWCause;
 
   // detect the first stage that is not stalled
-  assign LatestUnstalledD = ~StallD & StallF;
+
+  assign LatestUnstalledD = ~StallD & StallF; // coverage tag: StallD always equals StallF
   assign LatestUnstalledE = ~StallE & StallD;
   assign LatestUnstalledM = ~StallM & StallE;
   assign LatestUnstalledW = ~StallW & StallM;
   
   // Each stage flushes if the previous stage is the last one stalled (for cause) or the system has reason to flush
-  assign FlushD = LatestUnstalledD | FlushDCause; 
+  assign FlushD = LatestUnstalledD | FlushDCause; // coverage tag: LatestUnstalledD always 0
   assign FlushE = LatestUnstalledE | FlushECause;
   assign FlushM = LatestUnstalledM | FlushMCause;
   assign FlushW = LatestUnstalledW | FlushWCause;

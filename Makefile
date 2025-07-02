@@ -6,13 +6,13 @@ MAKEFLAGS += --output-sync --no-print-directory
 
 SIM = ${WALLY}/sim
 
-.PHONY: all riscof testfloat combined_IF_vectors zsbl benchmarks coremark embench coverage cvw-arch-verif clean
+.PHONY: all riscof testfloat combined_IF_vectors zsbl coverage cvw-arch-verif sim_bp deriv clean
 
-all: riscof	testfloat combined_IF_vectors zsbl coverage # cvw-arch-verif benchmarks
+all: riscof	testfloat combined_IF_vectors zsbl coverage sim_bp cvw-arch-verif deriv
 
 # riscof builds the riscv-arch-test and wally-riscv-arch-test suites
 riscof:
-	$(MAKE) -C sim
+	$(MAKE) -C tests/riscof
 
 testfloat:
 	$(MAKE) -C ${WALLY}/tests/fp vectors
@@ -23,21 +23,19 @@ combined_IF_vectors: testfloat riscof
 zsbl:
 	$(MAKE) -C ${WALLY}/fpga/zsbl
 
-benchmarks:
-	$(MAKE) coremark
-	$(MAKE) embench
-
-coremark:
-	cd ${WALLY}/benchmarks/coremark; $(MAKE); $(MAKE) run
-
-embench:
-	cd ${WALLY}/benchmarks/embench; $(MAKE); $(MAKE) run
-
 coverage:
 	$(MAKE) -C tests/coverage
 
+deriv:
+	derivgen.pl
+
 cvw-arch-verif:
 	$(MAKE) -C ${WALLY}/addins/cvw-arch-verif
+
+sim_bp: ${WALLY}/addins/branch-predictor-simulator/src/sim_bp
+
+${WALLY}/addins/branch-predictor-simulator/src/sim_bp:
+	$(MAKE) -C ${WALLY}/addins/branch-predictor-simulator/src
 
 # Requires a license for the Breker tool. See tests/breker/README.md for details
 breker:
@@ -45,6 +43,8 @@ breker:
 	$(MAKE) -C ${WALLY}/tests/breker
 
 clean:
-	$(MAKE) clean -C sim
+	$(MAKE) clean -C ${WALLY}/tests/riscof
 	$(MAKE) clean -C ${WALLY}/tests/fp
+	$(MAKE) clean -C ${WALLY}/fpga/zsbl
+	$(MAKE) clean -C ${WALLY}/tests/coverage
 	$(MAKE) clean -C ${WALLY}/addins/cvw-arch-verif

@@ -94,7 +94,7 @@ string embench[] = '{
   "bd_speedopt_speed/src/edn/edn",
   "bd_speedopt_speed/src/huffbench/huffbench",
   "bd_speedopt_speed/src/matmult-int/matmult-int",
-  "bd_speedopt_speed/src/md5sum/md5sum", //commenting out tests from embench 2.0. When embench 2.0 launches stabilty, add these tests back
+  "bd_speedopt_speed/src/md5sum/md5sum", //commenting out tests from embench 2.0. When embench 2.0 launches stably, add these tests back
   "bd_speedopt_speed/src/minver/minver",
   "bd_speedopt_speed/src/nettle-aes/nettle-aes",
   "bd_speedopt_speed/src/nettle-sha256/nettle-sha256",
@@ -153,25 +153,25 @@ string arch32pmp[] = '{
   `RISCVARCHTEST,
   "rv32i_m/pmp32/src/pmp-CFG-reg.S",
   "rv32i_m/pmp32/src/pmp-CSR-access.S",
-  "rv32i_m/pmp32/src/pmp-NA4-R-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NA4-R-priority.S",
-  "rv32i_m/pmp32/src/pmp-NA4-R.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RW-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RW-priority.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RW.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-R-priority-level-2.S", *** restore when BLOCKED is removed after tests work with G > 0
+  //"rv32i_m/pmp32/src/pmp-NA4-R-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-R.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RW-priority-level-2.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RW-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RW.S",
   "rv32i_m/pmp32/src/pmp-NA4-RWX.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RX-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RX-priority.S",
-  "rv32i_m/pmp32/src/pmp-NA4-RX.S",
-  "rv32i_m/pmp32/src/pmp-NA4-X-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NA4-X-priority.S",
-  "rv32i_m/pmp32/src/pmp-NA4-X.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-R-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-R-priority.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-R.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-RW-priority-level-2.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-RW-priority.S",
-  "rv32i_m/pmp32/src/pmp-NAPOT-RW.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RX-priority-level-2.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RX-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-RX.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-X-priority-level-2.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-X-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NA4-X.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-R-priority-level-2.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-R-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-R.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-RW-priority-level-2.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-RW-priority.S",
+  //"rv32i_m/pmp32/src/pmp-NAPOT-RW.S",
   "rv32i_m/pmp32/src/pmp-NAPOT-RWX.S",
   "rv32i_m/pmp32/src/pmp-NAPOT-RX-priority-level-2.S",
   "rv32i_m/pmp32/src/pmp-NAPOT-RX-priority.S",
@@ -194,50 +194,18 @@ string arch32pmp[] = '{
   "rv32i_m/pmp32/src/pmp-TOR-X.S"
 };
 
-// Tests commented out pending riscv-arch-test issue #588
 string arch64pmp[] = '{
   `RISCVARCHTEST,
-  "rv64i_m/pmp64/src/pmp64-CFG-reg.S",
-  "rv64i_m/pmp64/src/pmp64-CSR-access.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-R-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-R-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-R.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RW-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RW-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RW.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RWX.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RX-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RX-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-RX.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-X-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-X-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NA4-X.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-R-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-R-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-R.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RW-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RW-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RW.S",
-  // "rv64i_m/pmp64/src/pmp64-NAPOT-RWX.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RX-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RX-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-RX.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-X-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-X-priority.S",
-  "rv64i_m/pmp64/src/pmp64-NAPOT-X.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-R-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-R-priority.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-R.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RW-priority-level-2..S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RW-priority.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RW.S",
-  // "rv64i_m/pmp64/src/pmp64-TOR-RWX.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RX-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RX-priority.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-RX.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-X-priority-level-2.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-X-priority.S",
-  "rv64i_m/pmp64/src/pmp64-TOR-X.S"
+  "rv64i_m/pmp/src/pmp64-CSR-ALL-MODES.S",
+  //"rv64i_m/pmp/src/pmp64-NA4-M.S", *** restore when PMP tests work with G > 0
+  //"rv64i_m/pmp/src/pmp64-NA4-S.S",
+  //"rv64i_m/pmp/src/pmp64-NA4-U.S",
+  //"rv64i_m/pmp/src/pmp64-NAPOT-M.S",
+  "rv64i_m/pmp/src/pmp64-NAPOT-S.S",
+  "rv64i_m/pmp/src/pmp64-NAPOT-U.S",
+  "rv64i_m/pmp/src/pmp64-TOR-M.S",
+  "rv64i_m/pmp/src/pmp64-TOR-S.S",
+  "rv64i_m/pmp/src/pmp64-TOR-U.S"
 };
 
 string arch32vm_sv32[] = '{
@@ -245,14 +213,17 @@ string arch32vm_sv32[] = '{
   "rv32i_m/vm_sv32/src/mstatus_tvm_test.S",
   "rv32i_m/vm_sv32/src/pmp_check_on_pa_S_mode.S",
   "rv32i_m/vm_sv32/src/pmp_check_on_pa_U_mode.S",
-  "rv32i_m/vm_sv32/src/pmp_check_on_pte_S_mode.S",
-  "rv32i_m/vm_sv32/src/pmp_check_on_pte_U_mode.S",
+  //"rv32i_m/vm_sv32/src/pmp_check_on_pte_S_mode.S", *** restore when PMP tests work with G > 0
+  //"rv32i_m/vm_sv32/src/pmp_check_on_pte_U_mode.S",
   "rv32i_m/vm_sv32/src/satp_access_tests.S",
   "rv32i_m/vm_sv32/src/vm_A_and_D_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_A_and_D_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_U_Bit_set_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_U_Bit_unset_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_U_Bit_unset_U_mode.S",
+  "rv32i_m/vm_sv32/src/vm_VA_all_ones_S_mode.S",
+  "rv32i_m/vm_sv32/src/vm_global_pte_S_mode.S",
+  "rv32i_m/vm_sv32/src/vm_global_pte_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_invalid_pte_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_invalid_pte_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_misaligned_S_mode.S",
@@ -261,6 +232,9 @@ string arch32vm_sv32[] = '{
   "rv32i_m/vm_sv32/src/vm_mprv_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_mprv_U_set_sum_set_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_mprv_U_set_sum_unset_S_mode.S",
+  "rv32i_m/vm_sv32/src/vm_mprv_bare_mode.S",
+  // "rv32i_m/vm_sv32/src/vm_mstatus_sbe_set_S_mode.S", TODO: Reenable when Sail big endian support is merged
+  // "rv32i_m/vm_sv32/src/vm_mstatus_sbe_set_sum_set_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_mxr_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_mxr_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_nleaf_pte_level0_S_mode.S",
@@ -270,6 +244,7 @@ string arch32vm_sv32[] = '{
   "rv32i_m/vm_sv32/src/vm_reserved_rwx_pte_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_reserved_rwx_pte_U_mode.S",
   "rv32i_m/vm_sv32/src/vm_sum_set_S_mode.S",
+  "rv32i_m/vm_sv32/src/vm_sum_set_U_Bit_unset_S_mode.S",
   "rv32i_m/vm_sv32/src/vm_sum_unset_S_mode.S"
 };
 
@@ -277,7 +252,6 @@ string arch64priv[] = '{
   `RISCVARCHTEST,
   "rv64i_m/privilege/src/ebreak.S",
   "rv64i_m/privilege/src/ecall.S",
-  // "rv64i_m/privilege/src/misalign1-jalr-01.S",
   "rv64i_m/privilege/src/misalign2-jalr-01.S",
   "rv64i_m/privilege/src/misalign-beq-01.S",
   "rv64i_m/privilege/src/misalign-bge-01.S",
@@ -285,9 +259,7 @@ string arch64priv[] = '{
   "rv64i_m/privilege/src/misalign-blt-01.S",
   "rv64i_m/privilege/src/misalign-bltu-01.S",
   "rv64i_m/privilege/src/misalign-bne-01.S",
-  "rv64i_m/privilege/src/misalign-jal-01.S"
-  // removed because rv64gc supports Zicclsm
-  /* -----\/----- EXCLUDED -----\/-----
+  "rv64i_m/privilege/src/misalign-jal-01.S",
   "rv64i_m/privilege/src/misalign-ld-01.S",
   "rv64i_m/privilege/src/misalign-lh-01.S",
   "rv64i_m/privilege/src/misalign-lhu-01.S",
@@ -296,7 +268,6 @@ string arch64priv[] = '{
   "rv64i_m/privilege/src/misalign-sd-01.S",
   "rv64i_m/privilege/src/misalign-sh-01.S",
   "rv64i_m/privilege/src/misalign-sw-01.S"
-  -----/\----- EXCLUDED -----/\----- */
 };
 
 string arch64zifencei[] = '{
@@ -1893,12 +1864,12 @@ string arch64d[] = '{
   "rv64i_m/D/src/fssub.d_b8-01.S"
 };
 
-string arch64zicboz[] = '{ // as of 12/17/23 presently cbo.zero is the only CMO insturction with riscv-arch-test support
+string arch64zicboz[] = '{ // as of 12/17/23 presently cbo.zero is the only CMO instruction with riscv-arch-test support
   `RISCVARCHTEST,
   "rv64i_m/CMO/src/cbo.zero-01.S"
 };
 
-string arch32zicboz[] = '{ // as of 12/17/23 presently cbo.zero is the only CMO insturction with riscv-arch-test support
+string arch32zicboz[] = '{ // as of 12/17/23 presently cbo.zero is the only CMO instruction with riscv-arch-test support
   `RISCVARCHTEST,
   "rv32i_m/CMO/src/cbo.zero-01.S"
 };
@@ -2038,7 +2009,6 @@ string arch32priv[] = '{
   `RISCVARCHTEST,
   "rv32i_m/privilege/src/ebreak.S",
   "rv32i_m/privilege/src/ecall.S",
-  // "rv32i_m/privilege/src/misalign1-jalr-01.S",
   "rv32i_m/privilege/src/misalign2-jalr-01.S",
   "rv32i_m/privilege/src/misalign-beq-01.S",
   "rv32i_m/privilege/src/misalign-bge-01.S",
@@ -3611,6 +3581,7 @@ string wally32priv[] = '{
   "rv32i_m/privilege/src/WALLY-endianness-01.S",
   "rv32i_m/privilege/src/WALLY-satp-invalid-01.S",
   // These peripherals are here instead of wally32periph because they don't work on rv32imc, which lacks a PMP register to configure
+  "rv32i_m/privilege/src/WALLY-periph-s-01.S",
   "rv32i_m/privilege/src/WALLY-gpio-01.S",
   "rv32i_m/privilege/src/WALLY-clint-01.S",
   "rv32i_m/privilege/src/WALLY-uart-01.S",

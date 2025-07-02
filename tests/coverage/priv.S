@@ -24,7 +24,7 @@
 // and limitations under the License.
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-// load code to initalize stack, handle interrupts, terminate
+// load code to initialize stack, handle interrupts, terminate
 #include "WALLY-init-lib.h"
 
 main:
@@ -308,6 +308,9 @@ sretdone:
 
     # exercise sret with rs1 not 0
     .word 0x102F8073
+
+    # illegal ebreak with nonzero rs1
+    .word 0x00110073
 
 
     # cover mret when mpp = 3 and mprv = 1

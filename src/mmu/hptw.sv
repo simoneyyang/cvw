@@ -86,7 +86,7 @@ module hptw import cvw::*;  #(parameter cvw_t P) (
   logic [1:0]               NextPageType;
   logic [P.SVMODE_BITS-1:0] SvMode;
   logic [P.XLEN-1:0]        TranslationVAdr;
-  logic [P.XLEN-1:0]        NextPTE;
+  logic [P.XLEN-1:0]        NextPTE, NextPTE2;
   logic                     UpdatePTE;
   logic                     HPTWUpdateDA;
   logic [P.PA_BITS-1:0]     HPTWReadAdr;
@@ -107,8 +107,7 @@ module hptw import cvw::*;  #(parameter cvw_t P) (
   logic                     DAUFaultM;
   logic                     PBMTOrDAUFaultM;
   logic                     HPTWFaultM;
-  logic                     ResetPTE;
-  
+ 
   // map hptw access faults onto either the original LSU load/store fault or instruction access fault
   assign LSUAccessFaultM         = LSULoadAccessFaultM | LSUStoreAmoAccessFaultM;
   assign PBMTOrDAUFaultM         = PBMTFaultM | DAUFaultM;
@@ -146,8 +145,9 @@ module hptw import cvw::*;  #(parameter cvw_t P) (
 
   // State flops
   flopenr #(1) TLBMissMReg(clk, reset, StartWalk, DTLBMissOrUpdateDAM, DTLBWalk); // when walk begins, record whether it was for DTLB (or record 0 for ITLB)
-  assign PRegEn = HPTWRW[1] & ~DCacheBusStallM | UpdatePTE;
-  flopenr #(P.XLEN) PTEReg(clk, ResetPTE, PRegEn, NextPTE, PTE); // Capture page table entry from data cache
+  assign PRegEn = HPTWRW[1] & ~DCacheBusStallM | UpdatePTE | (NextWalkerState == IDLE);
+  assign NextPTE2 = (NextWalkerState == IDLE) ? '0 : NextPTE;
+  flopenr #(P.XLEN) PTEReg(clk, reset, PRegEn, NextPTE2, PTE); // Capture page table entry from data cache
 
   // Assign PTE descriptors common across all XLEN values
   // For non-leaf PTEs, D, A, U bits are reserved and ignored.  They do not cause faults while walking the page table
@@ -200,8 +200,8 @@ module hptw import cvw::*;  #(parameter cvw_t P) (
     assign InvalidOp = DTLBWalk ? (InvalidRead | InvalidWrite) : ~Executable;
     assign OtherPageFault = ImproperPrivilege | InvalidOp | UpperBitsUnequalD | Misaligned | ~Valid;
 
-    // hptw needs to know if there is a Dirty or Access fault occuring on this
-    // memory access.  If there is the PTE needs to be updated seting Access
+    // hptw needs to know if there is a Dirty or Access fault occurring on this
+    // memory access.  If there is the PTE needs to be updated setting Access
     // and possibly also Dirty.  Dirty is set if the operation is a store/amo.
     // However any other fault should not cause the update, and updates are in software when ENVCFG_ADUE = 0
     assign HPTWUpdateDA = ValidLeafPTE & (~Accessed | SetDirty) & ENVCFG_ADUE & ~OtherPageFault;   
@@ -310,14 +310,13 @@ module hptw import cvw::*;  #(parameter cvw_t P) (
 
   assign HPTWFlushW = (WalkerState == IDLE & TLBMissOrUpdateDA) | (WalkerState != IDLE & HPTWFaultM);
   
-  assign ResetPTE = reset | (NextWalkerState == IDLE);
   assign SelHPTW = WalkerState != IDLE;
   assign HPTWStall = (WalkerState != IDLE & WalkerState != FAULT) | (WalkerState == IDLE & TLBMissOrUpdateDA); 
 
   // HTPW address/data/control muxing
 
   // Once the walk is done and it is time to update the TLB we need to switch back 
-  // to the orignal data virtual address.
+  // to the original data virtual address.
   assign SelHPTWAdr = SelHPTW & ~(DTLBWriteM | ITLBWriteF);
 
   // multiplex the outputs to LSU
