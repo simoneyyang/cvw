@@ -185,7 +185,7 @@ void genAddTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, 
 }
 
 void genFmaTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, int roundingMode, int zeroAllowed, int infAllowed, int nanAllowed) {
-    int i, j, k, l, numCases;
+    int i, j, k, l, m, numCases;
     float16_t x, y, z;
     float16_t cases[100000];
     FILE *fptr;
@@ -205,7 +205,10 @@ void genFmaTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, 
                 z.v = cases[k].v;
                 for (l=0; l<=sgn; l++) {
                     y.v ^= (l<<15);
-                    genCase(fptr, x, y, z, 1, 1, 0, 0, roundingMode, zeroAllowed, infAllowed, nanAllowed);
+                    for (m = 0; m<=sgn; m++) {
+                        z.v ^= (l<<15);
+                        genCase(fptr, x, y, z, 1, 1, 0, 0, roundingMode, zeroAllowed, infAllowed, nanAllowed);
+                    }
                 }
             }
         }
@@ -249,9 +252,9 @@ int main()
     softfloat_roundingMode = softfloat_round_near_even;
     genFmaTests(specExponents, specFracts, 1, "fma_special_rne", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RNE", 1, 1, 1, 1);
     softfloat_roundingMode = softfloat_round_max;
-    genFmaTests(specExponents, specFracts, 1, "fma_special_rp", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RP", 1, 1, 1, 1);
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rp", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RP", 2, 1, 1, 1);
     softfloat_roundingMode = softfloat_round_min;
-    genFmaTests(specExponents, specFracts, 1, "fma_special_rn", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RN", 1, 1, 1, 1);
+    genFmaTests(specExponents, specFracts, 1, "fma_special_rn", "// FMA with signed, exponent of 0, -14, 14, inf, zero, subnorm, NaN, significand of 1.0 1.1 1.0000000001 and 1.1111111111, RN", 3, 1, 1, 1);
 
     return 0;
 }
