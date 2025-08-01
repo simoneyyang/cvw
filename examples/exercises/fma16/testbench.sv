@@ -6,7 +6,7 @@ module testbench_fma16;
   logic        mul, add, negp, negz;
   logic [1:0]  roundmode;
   logic [31:0] vectornum, errors;
-  logic [75:0] testvectors[10000:0];
+  logic [75:0] testvectors[40000:0];
   logic [3:0]  flags, flagsexpected; // Invalid, Overflow, Underflow, Inexact
 
   // instantiate device under test
@@ -30,7 +30,18 @@ module testbench_fma16;
       // $readmemh("work/fmul_0.tv", testvectors);
       // $readmemh("work/fmul_1.tv", testvectors);
       // $readmemh("work/fmul_2.tv", testvectors);
-      $readmemh("tests/fadd_1.tv", testvectors);
+      // $readmemh("tests/fadd_0.tv", testvectors);
+      // $readmemh("tests/fadd_1.tv", testvectors);
+      // $readmemh("tests/fadd_2.tv", testvectors);
+      // $readmemh("work/fadd_0.tv", testvectors);
+      // $readmemh("work/fadd_1.tv", testvectors);
+      // $readmemh("work/fadd_2.tv", testvectors);
+      // $readmemh("tests/fma_0.tv", testvectors);
+      // $readmemh("tests/fma_1.tv", testvectors);
+      $readmemh("tests/fma_2.tv", testvectors);
+      // $readmemh("work/fma_0.tv", testvectors);
+      // $readmemh("work/fma_1.tv", testvectors);
+      // $readmemh("work/fma_2.tv", testvectors);
       vectornum = 0; errors = 0;
       reset = 1; #22; reset = 0;
     end
