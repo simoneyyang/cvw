@@ -6,7 +6,7 @@ module testbench_fma16;
   logic        mul, add, negp, negz;
   logic [1:0]  roundmode;
   logic [31:0] vectornum, errors;
-  logic [75:0] testvectors[40000:0];
+  logic [75:0] testvectors[110000:0];
   logic [3:0]  flags, flagsexpected; // Invalid, Overflow, Underflow, Inexact
 
   // instantiate device under test
@@ -24,24 +24,42 @@ module testbench_fma16;
       $dumpfile("fma16.vcd");
       $dumpvars(0, testbench_fma16);
 
-      // $readmemh("tests/fmul_0.tv", testvectors);
-      // $readmemh("tests/fmul_1.tv", testvectors);
-      // $readmemh("tests/fmul_2.tv", testvectors);
-      // $readmemh("work/fmul_0.tv", testvectors);
-      // $readmemh("work/fmul_1.tv", testvectors);
-      // $readmemh("work/fmul_2.tv", testvectors);
-      // $readmemh("tests/fadd_0.tv", testvectors);
-      // $readmemh("tests/fadd_1.tv", testvectors);
-      // $readmemh("tests/fadd_2.tv", testvectors);
-      // $readmemh("work/fadd_0.tv", testvectors);
-      // $readmemh("work/fadd_1.tv", testvectors);
-      // $readmemh("work/fadd_2.tv", testvectors);
-      // $readmemh("tests/fma_0.tv", testvectors);
-      // $readmemh("tests/fma_1.tv", testvectors);
-      $readmemh("tests/fma_2.tv", testvectors);
-      // $readmemh("work/fma_0.tv", testvectors);
-      // $readmemh("work/fma_1.tv", testvectors);
-      // $readmemh("work/fma_2.tv", testvectors);
+      // $readmemh("tests/fmul_0.tv", testvectors); // passed
+      // $readmemh("tests/fmul_1.tv", testvectors); // passed
+      // $readmemh("tests/fmul_2.tv", testvectors); // passed
+      // $readmemh("work/fmul_0.tv", testvectors); // passed
+      // $readmemh("work/fmul_1.tv", testvectors); // passed
+      // $readmemh("work/fmul_2.tv", testvectors); // passed
+      // $readmemh("tests/fadd_0.tv", testvectors); // passed
+      // $readmemh("tests/fadd_1.tv", testvectors); // passed
+      // $readmemh("tests/fadd_2.tv", testvectors); // passed
+      // $readmemh("work/fadd_0.tv", testvectors); // passed
+      // $readmemh("work/fadd_1.tv", testvectors); // passed
+      // $readmemh("work/fadd_2.tv", testvectors); // passed
+      // $readmemh("tests/fma_0.tv", testvectors); // passed
+      // $readmemh("tests/fma_1.tv", testvectors); // passed
+      // $readmemh("tests/fma_2.tv", testvectors); // passed
+      // $readmemh("work/fma_0.tv", testvectors); // passed
+      // $readmemh("work/fma_1.tv", testvectors); // passed
+      // $readmemh("work/fma_2.tv", testvectors); // passed
+      // $readmemh("tests/fma_special_rz.tv", testvectors); // passed
+      // $readmemh("work/fma_special_rz.tv", testvectors); // passed
+      // $readmemh("tests/fma_special_rp.tv", testvectors); // passed
+      // $readmemh("handwritten_tests/fma_special_rp.tv", testvectors); // passed
+      // $readmemh("tests/fma_special_rm.tv", testvectors); // passed
+      // $readmemh("handwritten_tests/fma_special_rn.tv", testvectors); // passed
+      // $readmemh("tests/fma_special_rne.tv", testvectors); // passed
+      // $readmemh("work/fma_special_rne.tv", testvectors); // passed
+      // $readmemh("tests/baby_torture.tv", testvectors);
+
+      // $readmemh("work/fma_simone.tv", testvectors);
+
+      // manually written specific, short tests (for easier specific debugging and waveform comparing)
+      // $readmemh("handwritten_tests/roundingoraddproblem.tv", testvectors);
+      // $readmemh("handwritten_tests/rneclosetoone.tv", testvectors);
+      // $readmemh("handwritten_tests/killingP.tv", testvectors);
+      // $readmemh("handwritten_tests/zeros.tv", testvectors);
+      // $readmemh("handwritten_tests/overflow.tv", testvectors);
       vectornum = 0; errors = 0;
       reset = 1; #22; reset = 0;
     end
@@ -56,7 +74,7 @@ module testbench_fma16;
   // check results on falling edge of clk
   always @(negedge clk)
     if (~reset) begin // skip during reset
-      if (result !== rexpected /* | flags !== flagsexpected */) begin  // check result
+      if (result !== rexpected | flags !== flagsexpected ) begin  // check result
         $display("Error: inputs %h * %h + %h", x, y, z);
         $display("  result = %h (%h expected) flags = %b (%b expected)", 
           result, rexpected, flags, flagsexpected);

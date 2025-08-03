@@ -35,9 +35,9 @@ uint16_t specFracts[] = {0, 0x001, 0x200, 0x3FE, 0x3FF,0x8000};
 // ^^ 1.0, 1.0009765625 (smallest nonzero), 1.5, 1.998046875, 1.9990234375 (largest) and terminate
 
 // my attempt at evilish tests
-uint16_t simoneExponents[] = {3, 14, 15, 16, 28, 0x8000}; 
+uint16_t simoneExponents[] = {0, 14, 16, 32, 0x8000}; 
 // ^^ biased exponents make -12, -1, 0, 1, 12, and terminate 
-uint16_t simoneFracts[] = {0x333, 0x081, 0x181, 0x2AA, 0x300, 0x3FF,0x8000}; 
+uint16_t simoneFracts[] = {0, 0x001, 0x200, 0x2AA, 0x300, 0x3FF, 0x8000}; 
 // ^^ 1.7998046875, 1.1259765625, 1.3759765625, 1.666015625, 1.75, 1.9990234375 (largest) and terminate
 
 void softfloatInit(void) {
@@ -104,9 +104,17 @@ void genCase(FILE *fptr, float16_t x, float16_t y, float16_t z, int mul, int add
     smallest.v = 0x0400;
     float16_t resultmag = result;
     resultmag.v &= 0x7FFF; // take absolute value
+    float16_t xmag = x2;
+    xmag.v &= 0x7FFF; // take absolute value
+    float16_t ymag = y;
+    ymag.v &= 0x7FFF; // take absolute value
+    float16_t zmag = z2;
+    zmag.v &= 0x7FFF; // take absolute value
     if (f16_lt(resultmag, smallest) && (resultmag.v != 0x0000)) fprintf (fptr, "// skip denorm: ");
     if ((softfloat_exceptionFlags >> 1) % 2) fprintf(fptr, "// skip underflow: ");
 
+    if ((f16_lt(xmag, smallest) && (xmag.v != 0x0000)) || (f16_lt(ymag, smallest) && (ymag.v != 0x0000))
+                || (f16_lt(zmag, smallest) && (zmag.v != 0x0000))) fprintf (fptr, "// skip subnorm: ");
     // skip special cases if requested
     if (resultmag.v == 0x0000 && !zeroAllowed) fprintf(fptr, "// skip zero: ");
     if ((resultmag.v == 0x7C00 || resultmag.v == 0x7BFF) && !infAllowed)  fprintf(fptr, "// Skip inf: ");
@@ -207,7 +215,7 @@ void genFmaTests(uint16_t *e, uint16_t *f, int sgn, char *testName, char *desc, 
                     y.v ^= (l<<15);
                     for (m = 0; m<=sgn; m++) {
                         z.v ^= (l<<15);
-                        genCase(fptr, x, y, z, 1, 1, 0, 0, roundingMode, zeroAllowed, infAllowed, nanAllowed);
+                        genCase(fptr, x, y, z, 1, 1, l, m, roundingMode, zeroAllowed, infAllowed, nanAllowed);
                     }
                 }
             }
